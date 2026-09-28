@@ -1,75 +1,93 @@
-# React + TypeScript + Vite
+# TaskFlow
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TaskFlow is a responsive project and task management dashboard for small teams. It brings project progress, team activity, and upcoming work into one calm, practical workspace.
 
-Currently, two official plugins are available:
+## Screenshots
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Add current product screenshots to `screenshots/` before publishing the portfolio project.
 
-## React Compiler
+| Dashboard                   | Projects                   |
+| --------------------------- | -------------------------- |
+| `screenshots/dashboard.png` | `screenshots/projects.png` |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Live project
 
-## Expanding the ESLint configuration
+Not published yet. Add the deployed URL here after deploying the project (for example, with Vercel or Netlify).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Features
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Simulated sign-in with email and password validation, password visibility, and a remember-me option.
+- Responsive workspace navigation, global quick links, notification panel, and persistent light/dark theme.
+- Dashboard metrics, responsive task charts, and a recent projects table.
+- Project search, status filters, sorting, pagination, creation modal, and project details.
+- Task search, status and priority filters, pagination, and live status updates.
+- Team directory, deadline calendar, and personal notification preferences.
+- Editable user profile with avatar preview and local persistence.
+- Loading skeletons, error and empty states, form validation, and success feedback.
+- Mock API isolated from presentation code and queried through TanStack Query.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- React 19, TypeScript, and Vite
+- Tailwind CSS 4
+- React Router 7
+- TanStack Query 5
+- Recharts
+- Lucide React
 
+## Project structure
+
+```text
+src/
+├── assets/
+├── components/
+│   ├── dashboard/
+│   ├── layout/
+│   └── ui/
+├── data/
+├── hooks/
+├── layouts/
+├── pages/
+│   ├── Calendar/
+│   ├── Dashboard/
+│   ├── Login/
+│   ├── Projects/
+│   ├── Settings/
+│   ├── Tasks/
+│   ├── Team/
+│   └── _shared/
+├── services/
+├── types/
+├── utils/
+├── App.tsx
+├── index.css
+└── main.tsx
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Page entry points live in their corresponding directories. Shared project, task, team, calendar, and settings page components are kept in `pages/_shared/WorkPages.tsx` to avoid duplicating their common table and form behavior.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Run locally
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Requirements: Node.js 20.19+ or 22.12+ and npm.
 
+```bash
+npm install
+npm run dev
 ```
+
+Open the local URL printed by Vite. To enter the demo workspace, use any valid email address and a password with at least six characters.
+
+## Quality checks
+
+```bash
+npm run lint
+npm run build
+```
+
+## Data layer
+
+The mock API in `src/services/api.ts` simulates network latency and keeps project creation and task status changes in memory for the current session. `src/data.ts` contains the demo workspace data. TanStack Query handles request caching, loading, errors, and invalidation.
+
+## Deployment
+
+Build with `npm run build` and deploy the generated `dist/` directory to a static hosting provider. Configure the host to serve `index.html` as a fallback for client-side routes.
