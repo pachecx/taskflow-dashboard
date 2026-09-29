@@ -37,14 +37,24 @@ export function AvatarUpload({
   }
 
   return (
-    <div className="avatar-upload-row">
-      <Avatar src={avatar} name={name || "Profile photo"} size="large" />
-      <div className="avatar-upload-copy">
-        <strong>Profile photo</strong>
-        <span>JPG, PNG, or GIF. Maximum size 1.5 MB.</span>
-        <label className="avatar-upload-button">
+    <div className="flex items-center gap-3.75 rounded-md border border-(--line) bg-(--page) p-3.5 max-[650px]:items-start max-[650px]:p-2.75">
+      <Avatar
+        src={avatar}
+        name={name || "Profile photo"}
+        size="large"
+        className="!h-16 !w-16 max-[650px]:!h-13.5 max-[650px]:!w-13.5"
+      />
+      <div className="grid justify-items-start gap-1.25">
+        <strong className="text-[10px] text-(--text)">
+          Profile photo
+        </strong>
+        <span className="text-[9px] text-(--muted)">
+          JPG, PNG, or GIF. Maximum size 1.5 MB.
+        </span>
+        <label className="relative mt-0.5 inline-flex min-h-7.25 cursor-pointer items-center gap-1.5 rounded-[5px] border border-(--line) bg-(--surface) px-2.25 text-[9px] font-semibold text-(--muted-dark) hover:border-[#bdcfc2] focus-within:outline-[3px] focus-within:outline-[#91c4a9] focus-within:outline-offset-2">
           <ImagePlus size={14} /> Change photo
           <input
+            className="sr-only"
             type="file"
             accept="image/*"
             aria-label="Choose a profile photo"
@@ -55,7 +65,7 @@ export function AvatarUpload({
         </label>
         {error && (
           <span
-            className="profile-field-error"
+            className="text-[9px] text-[#b45f4d] dark:text-[#e5a08e]"
             id="profile-avatar-error"
             role="alert"
           >

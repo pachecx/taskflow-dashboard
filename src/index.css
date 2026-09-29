@@ -1,13 +1,27 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
-@import "./App.css";
+
+@custom-variant dark (&:where(.theme-dark, .theme-dark *));
 
 :root {
+  font-family: "DM Sans", sans-serif;
+  color: #24342c;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-optical-sizing: auto;
+  --page: #f5f7f5;
+  --surface: #fff;
+  --surface-hover: #f5f8f5;
+  --line: #e8ece8;
+  --text: #25352d;
+  --muted: #849087;
+  --muted-dark: #66736a;
+  --accent: #428363;
+  --accent-strong: #2e6d4c;
+  --accent-soft: #edf6ef;
+  --side: #1e342c;
 }
 html {
   min-width: 320px;
@@ -21,4 +35,65 @@ body {
 }
 #root {
   min-height: 100vh;
+}
+.theme-dark {
+  --page: #161e1a;
+  --surface: #202a24;
+  --surface-hover: #28342c;
+  --line: #344139;
+  --text: #e4ebe6;
+  --muted: #9aa69d;
+  --muted-dark: #b0bbb3;
+  --accent: #8ac6a1;
+  --accent-strong: #9ad4ad;
+  --accent-soft: #293c31;
+  --side: #17231c;
+  color-scheme: dark;
+}
+button,
+a,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #91c4a9;
+  outline-offset: 2px;
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -79,9 +79,15 @@ export function ProfileForm({
     const maxLength =
       field === "jobTitle" ? 60 : field === "location" ? 100 : undefined;
     return (
-      <div className="profile-form-field" key={field}>
-        <label htmlFor={`profile-${field}`}>{label}</label>
+      <div className="grid min-w-0 content-start gap-1.5" key={field}>
+        <label
+          className="text-[10px] font-semibold text-(--muted-dark)"
+          htmlFor={`profile-${field}`}
+        >
+          {label}
+        </label>
         <input
+          className="min-h-9.25 w-full rounded-[5px] border border-(--line) bg-(--surface) px-2.5 text-[10px] text-(--text) outline-none focus:border-[#85b493] aria-invalid:border-[#cb7a68]"
           id={`profile-${field}`}
           name={field}
           type={type}
@@ -102,7 +108,7 @@ export function ProfileForm({
         />
         {error && (
           <span
-            className="profile-field-error"
+            className="text-[9px] text-[#b45f4d] dark:text-[#e5a08e]"
             id={`profile-${field}-error`}
             role="alert"
           >
@@ -114,11 +120,19 @@ export function ProfileForm({
   }
 
   return (
-    <form className="panel profile-form-panel" onSubmit={submit} noValidate>
-      <div className="profile-section-heading">
+    <form
+      className="grid min-w-0 gap-4.25 rounded-lg border border-(--line) bg-(--surface) px-5.75 py-5 max-[650px]:px-3.25 max-[650px]:py-4"
+      onSubmit={submit}
+      noValidate
+    >
+      <div className="flex items-start justify-between">
         <div>
-          <h2>Edit personal information</h2>
-          <p>Update your profile details and photo.</p>
+          <h2 className="m-0 font-['Manrope',sans-serif] text-[13px] font-bold text-(--text)">
+            Edit personal information
+          </h2>
+          <p className="mt-1 mb-0 text-[10px] text-(--muted)">
+            Update your profile details and photo.
+          </p>
         </div>
       </div>
       <AvatarUpload
@@ -128,7 +142,7 @@ export function ProfileForm({
           setDraft((current) => ({ ...current, avatar }));
         }}
       />
-      <div className="profile-form-grid">
+      <div className="grid grid-cols-2 gap-x-4.5 gap-y-3.5 max-[650px]:grid-cols-1 max-[650px]:gap-y-3">
         {renderField("fullName", "Full Name")}
         {renderField("email", "Email Address", "email")}
         {renderField("jobTitle", "Job Title")}
@@ -136,11 +150,14 @@ export function ProfileForm({
         {renderField("location", "Location")}
       </div>
       {saveError && (
-        <p className="profile-save-error" role="alert">
+        <p
+          className="m-0 text-[10px] text-[#b45f4d] dark:text-[#e5a08e]"
+          role="alert"
+        >
           {saveError}
         </p>
       )}
-      <div className="profile-form-actions">
+      <div className="flex justify-end gap-2 border-t border-(--line) pt-3.5 max-[650px]:[&>button]:min-w-0 max-[650px]:[&>button]:flex-1">
         <Button
           type="button"
           variant="secondary"
@@ -152,7 +169,8 @@ export function ProfileForm({
         <Button type="submit" disabled={isSaving}>
           {isSaving ? (
             <>
-              <span className="button-spinner" /> Saving...
+              <span className="h-3.25 w-3.25 animate-[spin_0.7s_linear_infinite] rounded-full border-2 border-[#ffffff75] border-t-white" />{" "}
+              Saving...
             </>
           ) : (
             "Save Changes"
