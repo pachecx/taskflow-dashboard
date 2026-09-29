@@ -32,6 +32,15 @@ import type { Project, Task, TaskStatus } from "../../types";
 import { formatDate } from "../../utils/formatDate";
 
 const pageSize = 5;
+const tableClasses =
+  "w-full min-w-172.5 border-collapse text-left whitespace-nowrap [&_th]:border-b [&_th]:border-(--line) [&_th]:px-3 [&_th]:py-2.75 [&_th]:text-[9px] [&_th]:font-semibold [&_th]:text-(--muted) [&_td]:h-13.75 [&_td]:border-b [&_td]:border-(--line) [&_td]:px-3 [&_td]:py-2.25 [&_td]:text-[10px] [&_td]:text-(--muted-dark) [&_tbody_tr:last-child_td]:border-0 [&_tbody_tr:hover]:bg-(--surface-hover) [&_th:first-child]:pl-0.75 [&_td:first-child]:pl-0.75 max-[650px]:[&_th]:px-2.25 max-[650px]:[&_td]:px-2.25";
+const projectSymbolColors = {
+  mint: "bg-[#e9f4eb] text-[#478264] dark:bg-[#2c4133] dark:text-[#a1d0ae]",
+  lilac: "bg-[#f0eef8] text-[#766d9b] dark:bg-[#3a3548] dark:text-[#c1b5df]",
+  peach: "bg-[#fcf0e9] text-[#bd7958] dark:bg-[#493830] dark:text-[#e0b49b]",
+  blue: "bg-[#eaf2f7] text-[#587f9e] dark:bg-[#2d3e49] dark:text-[#a9c9dc]",
+  yellow: "bg-[#f7f3e6] text-[#9a8247] dark:bg-[#453f2f] dark:text-[#dcc88d]",
+};
 
 function SearchField({
   value,
@@ -43,9 +52,10 @@ function SearchField({
   placeholder?: string;
 }) {
   return (
-    <label className="search-field">
-      <Search size={16} />
+    <label className="flex h-8.5 w-[min(280px,35%)] items-center gap-2 rounded-[5px] border border-(--line) px-2.5 text-(--muted) focus-within:border-[#91b99c] max-[650px]:w-full">
+      <Search size={16} className="shrink-0" />
       <input
+        className="w-full min-w-0 border-0 bg-transparent text-[10px] text-(--text) outline-none placeholder:text-[#a0aaa3]"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
@@ -57,9 +67,11 @@ function SearchField({
 
 function LoadError({ retry }: { retry: () => void }) {
   return (
-    <div className="error-state">
-      <strong>Something didn't load</strong>
-      <p>Check your connection and try again.</p>
+    <div className="flex min-h-55 flex-col items-center justify-center gap-2.5">
+      <strong className="text-[13px]">Something didn't load</strong>
+      <p className="m-0 text-[10px] text-(--muted)">
+        Check your connection and try again.
+      </p>
       <Button variant="secondary" onClick={retry}>
         Try again
       </Button>
@@ -94,19 +106,21 @@ function NewProjectModal({ onClose }: { onClose: () => void }) {
   }
   return (
     <Modal title="Create a project" onClose={onClose}>
-      <form className="form-stack" onSubmit={submit} noValidate>
-        <label>
+      <form className="grid gap-3" onSubmit={submit} noValidate>
+        <label className="grid gap-1.5 text-[10px] font-semibold text-(--muted-dark)">
           Project name
           <input
+            className="min-h-9 w-full rounded-[5px] border border-(--line) bg-(--surface) px-2.5 py-2 text-[10px] font-normal text-(--text) outline-none focus:border-[#85b493]"
             autoFocus
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
             placeholder="e.g. Website redesign"
           />
         </label>
-        <label>
+        <label className="grid gap-1.5 text-[10px] font-semibold text-(--muted-dark)">
           Client
           <input
+            className="min-h-9 w-full rounded-[5px] border border-(--line) bg-(--surface) px-2.5 py-2 text-[10px] font-normal text-(--text) outline-none focus:border-[#85b493]"
             value={form.client}
             onChange={(event) =>
               setForm({ ...form, client: event.target.value })
@@ -114,9 +128,10 @@ function NewProjectModal({ onClose }: { onClose: () => void }) {
             placeholder="Company or team"
           />
         </label>
-        <label>
+        <label className="grid gap-1.5 text-[10px] font-semibold text-(--muted-dark)">
           Deadline
           <input
+            className="min-h-9 w-full rounded-[5px] border border-(--line) bg-(--surface) px-2.5 py-2 text-[10px] font-normal text-(--text) outline-none focus:border-[#85b493]"
             type="date"
             value={form.deadline}
             onChange={(event) =>
@@ -124,9 +139,13 @@ function NewProjectModal({ onClose }: { onClose: () => void }) {
             }
           />
         </label>
-        <label>
-          Description <span className="optional-label">Optional</span>
+        <label className="grid gap-1.5 text-[10px] font-semibold text-(--muted-dark)">
+          Description{" "}
+          <span className="text-[9px] font-normal text-(--muted)">
+            Optional
+          </span>
           <textarea
+            className="min-h-9 w-full resize-y rounded-[5px] border border-(--line) bg-(--surface) px-2.5 py-2 text-[10px] font-normal text-(--text) outline-none focus:border-[#85b493]"
             value={form.description}
             onChange={(event) =>
               setForm({ ...form, description: event.target.value })
@@ -136,16 +155,22 @@ function NewProjectModal({ onClose }: { onClose: () => void }) {
           />
         </label>
         {error && (
-          <p className="field-error" role="alert">
+          <p
+            className="m-0 text-[10px] text-[#b45f4d] dark:text-[#e5a08e]"
+            role="alert"
+          >
             {error}
           </p>
         )}
         {createProject.isError && (
-          <p className="field-error" role="alert">
+          <p
+            className="m-0 text-[10px] text-[#b45f4d] dark:text-[#e5a08e]"
+            role="alert"
+          >
             Couldn't create the project. Please try again.
           </p>
         )}
-        <div className="modal-actions">
+        <div className="flex justify-end gap-1.75 pt-1">
           <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
           </Button>
@@ -191,8 +216,8 @@ export function ProjectsPage() {
           </Button>
         }
       />
-      <section className="panel page-panel">
-        <div className="toolbar">
+      <section className="rounded-lg border border-(--line) bg-(--surface) px-5 pb-0.5">
+        <div className="flex min-h-16.75 items-center gap-2.25 border-b border-(--line) max-[650px]:min-h-0 max-[650px]:flex-wrap max-[650px]:gap-1.75 max-[650px]:py-3">
           <SearchField
             value={search}
             onChange={(value) => {
@@ -201,9 +226,10 @@ export function ProjectsPage() {
             }}
             placeholder="Search projects or clients"
           />
-          <label className="select-control">
+          <label className="inline-flex h-8.5 items-center gap-1.5 rounded-[5px] border border-(--line) px-2 text-(--muted-dark) max-[650px]:flex-1 max-[650px]:justify-center">
             <Filter size={15} />
             <select
+              className="max-w-31.25 appearance-none border-0 bg-transparent text-[10px] text-(--muted-dark) outline-none max-[650px]:max-w-none"
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value);
@@ -219,9 +245,10 @@ export function ProjectsPage() {
             </select>
             <ChevronDown size={14} />
           </label>
-          <label className="select-control sort-control">
+          <label className="inline-flex h-8.5 items-center gap-1.5 rounded-[5px] border border-(--line) px-2 text-(--muted-dark) max-[650px]:flex-1 max-[650px]:justify-center">
             <SlidersHorizontal size={15} />
             <select
+              className="max-w-31.25 appearance-none border-0 bg-transparent text-[10px] text-(--muted-dark) outline-none max-[650px]:max-w-none"
               value={sort}
               onChange={(event) => setSort(event.target.value)}
               aria-label="Sort projects"
@@ -231,12 +258,14 @@ export function ProjectsPage() {
             </select>
             <ChevronDown size={14} />
           </label>
-          <span className="result-count">{list.length} projects</span>
+          <span className="ml-auto text-[10px] text-(--muted) max-[650px]:m-0 max-[650px]:w-full">
+            {list.length} projects
+          </span>
         </div>
         {query.isPending ? (
-          <div className="loading-list">
+          <div className="py-2">
             {Array.from({ length: 4 }, (_, i) => (
-              <Skeleton key={i} className="skeleton-row" />
+              <Skeleton key={i} className="my-2.5 h-10.75 w-full" />
             ))}
           </div>
         ) : query.isError ? (
@@ -247,8 +276,8 @@ export function ProjectsPage() {
             message="Try a different search or clear your filters."
           />
         ) : (
-          <div className="table-scroll">
-            <table className="data-table project-list-table">
+          <div className="w-full overflow-x-auto">
+            <table className={`${tableClasses} [&_td]:h-16.25`}>
               <thead>
                 <tr>
                   <th>Project</th>
@@ -281,11 +310,16 @@ function ProjectRow({ project }: { project: Project }) {
   return (
     <tr>
       <td>
-        <Link className="project-name-link" to={`/projects/${project.id}`}>
-          <span className={`project-symbol symbol-${project.color}`}>
+        <Link
+          className="inline-flex items-center gap-2.25 text-(--text)"
+          to={`/projects/${project.id}`}
+        >
+          <span
+            className={`grid h-6.75 w-6.75 shrink-0 place-items-center rounded-md font-['Manrope',sans-serif] text-xs font-bold ${projectSymbolColors[project.color as keyof typeof projectSymbolColors]}`}
+          >
             {project.name.slice(0, 1)}
           </span>
-          <strong>{project.name}</strong>
+          <strong className="text-[10px] font-semibold">{project.name}</strong>
         </Link>
       </td>
       <td>{project.client}</td>
@@ -293,9 +327,11 @@ function ProjectRow({ project }: { project: Project }) {
         <Badge>{project.status}</Badge>
       </td>
       <td>
-        <div className="table-progress">
+        <div className="flex w-32.5 items-center gap-2 max-[1150px]:w-27.5">
           <ProgressBar value={project.progress} />
-          <span>{project.progress}%</span>
+          <span className="w-6.5 text-right text-[9px] text-(--muted)">
+            {project.progress}%
+          </span>
         </div>
       </td>
       <td>
@@ -315,7 +351,7 @@ function ProjectRow({ project }: { project: Project }) {
       <td>
         <Link
           to={`/projects/${project.id}`}
-          className="row-arrow"
+          className="inline-grid h-6.75 w-6.75 place-items-center rounded-[5px] text-(--muted) hover:bg-(--accent-soft) hover:text-(--accent-strong)"
           aria-label={`Open ${project.name}`}
         >
           <ArrowUpRight size={16} />
@@ -335,17 +371,20 @@ export function ProjectDetailPage() {
   const project = projectQuery.data;
   if (projectQuery.isPending)
     return (
-      <div className="detail-loading">
-        <Skeleton className="skeleton-line" />
-        <Skeleton className="skeleton-number" />
-        <Skeleton className="skeleton-row" />
+      <div className="grid max-w-137.5 gap-3">
+        <Skeleton className="my-1.25 h-2.5 w-3/4" />
+        <Skeleton className="my-1.25 h-6 w-[45%]" />
+        <Skeleton className="my-2.5 h-37.5 w-full" />
       </div>
     );
   if (!project)
     return (
       <>
         <PageHeading title="Project not found" />
-        <Link to="/projects" className="text-link">
+        <Link
+          to="/projects"
+          className="inline-flex items-center gap-1.25 text-[10px] font-semibold text-(--accent-strong) hover:underline"
+        >
           <ArrowLeft size={16} /> Back to projects
         </Link>
       </>
@@ -356,7 +395,10 @@ export function ProjectDetailPage() {
   );
   return (
     <>
-      <Link to="/projects" className="back-link">
+      <Link
+        to="/projects"
+        className="mb-5 inline-flex items-center gap-1.5 text-[10px] text-(--muted) hover:text-(--accent-strong)"
+      >
         <ArrowLeft size={16} /> All projects
       </Link>
       <PageHeading
@@ -365,17 +407,21 @@ export function ProjectDetailPage() {
         description={project.description}
         action={<Badge>{project.status}</Badge>}
       />
-      <section className="detail-summary panel">
+      <section className="mb-4 grid grid-cols-[1.4fr_1fr_1fr] gap-5 rounded-lg border border-(--line) bg-(--surface) p-[18px_20px] max-[650px]:grid-cols-2 max-[650px]:gap-x-2.5 max-[650px]:gap-y-4.25 max-[650px]:p-3.75 [&>div]:flex [&>div]:flex-col [&>div]:gap-2.25 [&>div:first-child]:max-[650px]:col-span-full">
         <div>
-          <span className="detail-label">Project progress</span>
-          <div className="detail-progress">
+          <span className="text-[9px] text-(--muted)">
+            Project progress
+          </span>
+          <div className="flex items-center gap-3">
             <ProgressBar value={project.progress} />
-            <strong>{project.progress}%</strong>
+            <strong className="text-[11px] text-(--text)">
+              {project.progress}%
+            </strong>
           </div>
         </div>
         <div>
-          <span className="detail-label">Deadline</span>
-          <strong>
+          <span className="text-[9px] text-(--muted)">Deadline</span>
+          <strong className="text-[11px] text-(--text)">
             {formatDate(project.deadline, {
               month: "long",
               day: "numeric",
@@ -384,7 +430,7 @@ export function ProjectDetailPage() {
           </strong>
         </div>
         <div>
-          <span className="detail-label">Team</span>
+          <span className="text-[9px] text-(--muted)">Team</span>
           <AvatarStack
             people={project.memberIds
               .map(
@@ -395,13 +441,20 @@ export function ProjectDetailPage() {
           />
         </div>
       </section>
-      <section className="panel page-panel">
-        <div className="panel-heading">
+      <section className="rounded-lg border border-(--line) bg-(--surface) px-5 pb-0.5">
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <h2>Project tasks</h2>
-            <p>{projectTasks.length} tasks in this project</p>
+            <h2 className="m-0 font-['Manrope',sans-serif] text-[13px] leading-normal font-bold text-(--text)">
+              Project tasks
+            </h2>
+            <p className="mt-0.5 mb-0 text-[10px] text-(--muted)">
+              {projectTasks.length} tasks in this project
+            </p>
           </div>
-          <Link to="/tasks" className="text-link">
+          <Link
+            to="/tasks"
+            className="inline-flex items-center gap-1.25 text-[10px] font-semibold text-(--accent-strong) hover:underline"
+          >
             All tasks <ArrowUpRight size={15} />
           </Link>
         </div>
@@ -441,7 +494,7 @@ export function TasksPage() {
         title="Tasks"
         description="A clear view of the work that moves your projects forward."
         action={
-          <span className="tasks-total">
+          <span className="inline-flex items-center gap-1.5 text-[10px] text-(--muted)">
             <Check size={15} />{" "}
             {query.data?.filter((task) => task.status === "Completed").length ??
               "—"}{" "}
@@ -449,8 +502,8 @@ export function TasksPage() {
           </span>
         }
       />
-      <section className="panel page-panel">
-        <div className="toolbar">
+      <section className="rounded-lg border border-(--line) bg-(--surface) px-5 pb-0.5">
+        <div className="flex min-h-16.75 items-center gap-2.25 border-b border-(--line) max-[650px]:min-h-0 max-[650px]:flex-wrap max-[650px]:gap-1.75 max-[650px]:py-3">
           <SearchField
             value={search}
             onChange={(value) => {
@@ -459,9 +512,10 @@ export function TasksPage() {
             }}
             placeholder="Search tasks"
           />
-          <label className="select-control">
+          <label className="inline-flex h-8.5 items-center gap-1.5 rounded-[5px] border border-(--line) px-2 text-(--muted-dark) max-[650px]:flex-1 max-[650px]:justify-center">
             <Filter size={15} />
             <select
+              className="max-w-31.25 appearance-none border-0 bg-transparent text-[10px] text-(--muted-dark) outline-none max-[650px]:max-w-none"
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value);
@@ -476,9 +530,12 @@ export function TasksPage() {
             </select>
             <ChevronDown size={14} />
           </label>
-          <label className="select-control">
-            <span className="priority-symbol">!</span>
+          <label className="inline-flex h-8.5 items-center gap-1.5 rounded-[5px] border border-(--line) px-2 text-(--muted-dark) max-[650px]:flex-1 max-[650px]:justify-center">
+            <span className="grid h-3.5 w-3.5 place-items-center rounded-full bg-[#f7f3e9] text-[10px] font-bold text-[#9b7a49]">
+              !
+            </span>
             <select
+              className="max-w-31.25 appearance-none border-0 bg-transparent text-[10px] text-(--muted-dark) outline-none max-[650px]:max-w-none"
               value={priority}
               onChange={(event) => {
                 setPriority(event.target.value);
@@ -493,12 +550,14 @@ export function TasksPage() {
             </select>
             <ChevronDown size={14} />
           </label>
-          <span className="result-count">{filtered.length} tasks</span>
+          <span className="ml-auto text-[10px] text-(--muted) max-[650px]:m-0 max-[650px]:w-full">
+            {filtered.length} tasks
+          </span>
         </div>
         {query.isPending ? (
-          <div className="loading-list">
+          <div className="py-2">
             {Array.from({ length: 5 }, (_, i) => (
-              <Skeleton key={i} className="skeleton-row" />
+              <Skeleton key={i} className="my-2.5 h-10.75 w-full" />
             ))}
           </div>
         ) : query.isError ? (
@@ -519,7 +578,10 @@ export function TasksPage() {
         )}
       </section>
       {update.isSuccess && (
-        <div className="toast" role="status">
+        <div
+          className="fixed right-6.25 bottom-6 z-[50] flex items-center gap-2 rounded-md border border-[#d5e8da] bg-[#f0f8f1] px-3.75 py-2.75 text-[11px] text-[#397950] shadow-[0_8px_24px_#1d38251a] animate-[enter_0.2s_ease]"
+          role="status"
+        >
           <Check size={16} /> Task status updated
         </div>
       )}
@@ -535,8 +597,8 @@ function TaskTable({
   onStatusChange?: (id: string, status: TaskStatus) => void;
 }) {
   return (
-    <div className="table-scroll">
-      <table className="data-table task-table">
+    <div className="w-full overflow-x-auto">
+      <table className={`${tableClasses} [&_td]:h-14.25`}>
         <thead>
           <tr>
             <th>Task</th>
@@ -556,12 +618,14 @@ function TaskTable({
             return (
               <tr key={task.id}>
                 <td>
-                  <strong className="task-title">{task.title}</strong>
+                  <strong className="text-[10px] font-semibold text-(--text)">
+                    {task.title}
+                  </strong>
                 </td>
                 <td>
                   {project ? (
                     <Link
-                      className="subtle-link"
+                      className="text-(--muted-dark) hover:text-(--accent-strong)"
                       to={`/projects/${project.id}`}
                     >
                       {project.name}
@@ -571,7 +635,7 @@ function TaskTable({
                   )}
                 </td>
                 <td>
-                  <span className="assignee-cell">
+                  <span className="inline-flex items-center gap-1.75">
                     <Avatar
                       src={member.avatar}
                       name={member.name}
@@ -587,8 +651,9 @@ function TaskTable({
                 </td>
                 <td>
                   {onStatusChange ? (
-                    <label className="status-select">
+                    <label className="inline-flex items-center gap-0.5 rounded border border-(--line) px-1.5 py-1 text-(--muted-dark) focus-within:border-[#91b99c]">
                       <select
+                        className="max-w-21.5 appearance-none border-0 bg-transparent text-[9px] text-inherit outline-none"
                         value={task.status}
                         onChange={(event) =>
                           onStatusChange(
@@ -640,37 +705,50 @@ export function TeamPage() {
       {query.isError ? (
         <LoadError retry={() => query.refetch()} />
       ) : (
-        <section className="team-grid">
+        <section className="grid grid-cols-3 gap-3.5 max-[900px]:grid-cols-2 max-[650px]:grid-cols-1 max-[650px]:gap-2.5">
           {query.isPending
             ? Array.from({ length: 6 }, (_, index) => (
-                <Skeleton key={index} className="team-skeleton" />
+                <Skeleton key={index} className="h-51.25 rounded-lg" />
               ))
             : query.data?.map((member, index) => (
-                <article className="team-card" key={member.id}>
-                  <div className={`team-card-accent accent-${index % 4}`} />
-                  <div className="team-card-main">
+                <article
+                  className="relative overflow-hidden rounded-lg border border-(--line) bg-(--surface)"
+                  key={member.id}
+                >
+                  <div
+                    className={`h-13.5 max-[650px]:h-10.75 ${["bg-[#e8f0e8]", "bg-[#e9edf3]", "bg-[#f4ece3]", "bg-[#ece9f2]"][index % 4]}`}
+                  />
+                  <div className="relative px-4.25 pb-4.25 max-[650px]:px-3.75">
                     <Avatar
                       src={member.avatar}
                       name={member.name}
                       size="large"
+                      className="-mt-7 border-[3px] border-(--surface) max-[650px]:-mt-6.25 max-[650px]:!h-14 max-[650px]:!w-14"
                     />
-                    <h2>{member.name}</h2>
-                    <p className="team-role">{member.role}</p>
-                    <a className="team-email" href={`mailto:${member.email}`}>
+                    <h2 className="mt-2.5 mb-0.5 font-['Manrope',sans-serif] text-[13px] font-bold text-(--text)">
+                      {member.name}
+                    </h2>
+                    <p className="m-0 text-[10px] text-(--muted)">
+                      {member.role}
+                    </p>
+                    <a
+                      className="mt-3.25 flex items-center gap-1.5 text-[10px] text-(--muted-dark) hover:text-(--accent-strong)"
+                      href={`mailto:${member.email}`}
+                    >
                       <Mail size={14} />
                       {member.email}
                     </a>
-                    <div className="team-meta">
-                      <span>
-                        <Check size={14} />
+                    <div className="mt-4 mb-3 flex gap-3.5 border-t border-(--line) pt-3 text-[9px] text-(--muted-dark)">
+                      <span className="inline-flex items-center gap-1.25">
+                        <Check size={14} className="text-[#619375]" />
                         {member.tasks} tasks
                       </span>
-                      <span>
-                        <UsersRound size={14} />
+                      <span className="inline-flex items-center gap-1.25">
+                        <UsersRound size={14} className="text-[#619375]" />
                         {member.projects.length} projects
                       </span>
                     </div>
-                    <div className="team-projects">
+                    <div className="flex flex-wrap gap-1.25">
                       {member.projects.slice(0, 2).map((project) => (
                         <Badge key={project} tone="neutral">
                           {project}
@@ -698,25 +776,36 @@ export function CalendarPage() {
         title="Calendar"
         description="Upcoming deadlines across your projects."
         action={
-          <button className="date-button">
+          <button className="inline-flex h-8.75 items-center gap-2 rounded-md border border-(--line) bg-(--surface) px-2.75 text-[10px] text-(--muted-dark) hover:border-[#a4c1ad]">
             <CalendarDays size={15} /> October 2026 <ChevronDown size={14} />
           </button>
         }
       />
-      <section className="calendar-layout">
-        <div className="panel calendar-panel">
-          <div className="calendar-month">
-            <button className="icon-button" aria-label="Previous month">
+      <section className="grid grid-cols-[minmax(0,1.5fr)_minmax(260px,0.8fr)] gap-3.75 max-[900px]:grid-cols-1">
+        <div className="rounded-lg border border-(--line) bg-(--surface) px-5 pt-4.25 pb-3.25 max-[650px]:px-2.5 max-[650px]:py-3.25">
+          <div className="mb-3.25 flex items-center justify-between">
+            <button
+              className="grid h-8.5 w-8.5 place-items-center rounded-md border-0 bg-transparent text-(--muted-dark) hover:bg-(--surface-hover) hover:text-(--text)"
+              aria-label="Previous month"
+            >
               ‹
             </button>
-            <strong>October 2026</strong>
-            <button className="icon-button" aria-label="Next month">
+            <strong className="font-['Manrope',sans-serif] text-[13px]">
+              October 2026
+            </strong>
+            <button
+              className="grid h-8.5 w-8.5 place-items-center rounded-md border-0 bg-transparent text-(--muted-dark) hover:bg-(--surface-hover) hover:text-(--text)"
+              aria-label="Next month"
+            >
               ›
             </button>
           </div>
-          <div className="calendar-grid">
+          <div className="grid grid-cols-7">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <span className="calendar-weekday" key={day}>
+              <span
+                className="py-2 text-center text-[9px] text-(--muted)"
+                key={day}
+              >
                 {day}
               </span>
             ))}
@@ -730,59 +819,72 @@ export function CalendarPage() {
               return (
                 <div
                   key={index}
-                  className={`calendar-day ${active ? "" : "muted-day"} ${day === 28 ? "today" : ""}`}
+                  className={`relative flex min-h-15 flex-col items-center gap-1 border-t border-(--line) px-0.75 py-1.75 text-[10px] text-(--text) max-[650px]:min-h-12.25 max-[380px]:min-h-10.75 ${active ? "" : "text-[#b8c0ba]"}`}
                 >
-                  <span>{active ? day : day < 1 ? 28 + day : day - 31}</span>
+                  <span
+                    className={`grid h-5.5 w-5.5 place-items-center rounded-full ${day === 28 ? "bg-[#488660] text-white" : ""}`}
+                  >
+                    {active ? day : day < 1 ? 28 + day : day - 31}
+                  </span>
                   {markers.slice(0, 2).map((task) => (
                     <i
                       key={task.id}
                       title={task.title}
-                      className={`calendar-dot dot-${task.priority.toLowerCase()}`}
+                      className={`inline-block h-1.25 w-1.25 rounded-full ${task.priority === "High" ? "bg-[#d98772]" : task.priority === "Medium" ? "bg-[#d3ad5f]" : "bg-[#83a28b]"}`}
                     />
                   ))}
                 </div>
               );
             })}
           </div>
-          <div className="calendar-legend">
-            <span>
-              <i className="calendar-dot dot-high" />
+          <div className="flex gap-3.5 pt-2.75 text-[9px] text-(--muted) max-[650px]:justify-center max-[650px]:gap-2.25 max-[650px]:text-[8px] max-[380px]:gap-1.5">
+            <span className="inline-flex items-center gap-1.5 max-[380px]:gap-1">
+              <i className="inline-block h-1.25 w-1.25 rounded-full bg-[#d98772]" />
               High priority
             </span>
-            <span>
-              <i className="calendar-dot dot-medium" />
+            <span className="inline-flex items-center gap-1.5 max-[380px]:gap-1">
+              <i className="inline-block h-1.25 w-1.25 rounded-full bg-[#d3ad5f]" />
               Medium
             </span>
-            <span>
-              <i className="calendar-dot dot-low" />
+            <span className="inline-flex items-center gap-1.5 max-[380px]:gap-1">
+              <i className="inline-block h-1.25 w-1.25 rounded-full bg-[#83a28b]" />
               Low
             </span>
           </div>
         </div>
-        <aside className="panel upcoming-panel">
-          <div className="panel-heading">
+        <aside className="grid grid-cols-1 rounded-lg border border-(--line) bg-(--surface) p-4.25 max-[900px]:grid-cols-2 max-[900px]:gap-x-4.5 max-[650px]:block">
+          <div className="col-span-full mb-2.25 flex items-start justify-between gap-3">
             <div>
-              <h2>Upcoming</h2>
-              <p>Next deadlines</p>
+              <h2 className="m-0 font-['Manrope',sans-serif] text-[13px] leading-normal font-bold text-(--text)">
+                Upcoming
+              </h2>
+              <p className="mt-0.5 mb-0 text-[10px] text-(--muted)">
+                Next deadlines
+              </p>
             </div>
           </div>
           {query.isPending
             ? Array.from({ length: 4 }, (_, i) => (
-                <Skeleton className="skeleton-row" key={i} />
+                <Skeleton className="my-2.5 h-10.75 w-full" key={i} />
               ))
             : upcoming.map((task) => (
-                <div className="upcoming-item" key={task.id}>
+                <div
+                  className="flex items-center gap-2.5 border-t border-(--line) py-2.75"
+                  key={task.id}
+                >
                   <span
-                    className={`upcoming-date date-${task.priority.toLowerCase()}`}
+                    className={`grid min-h-8.5 w-9.5 shrink-0 place-items-center rounded-[5px] text-[9px] font-semibold ${task.priority === "High" ? "bg-[#fbefeb] text-[#a55e4b] dark:bg-[#47342f] dark:text-[#e0a995]" : task.priority === "Medium" ? "bg-[#f8f3e7] text-[#94743f] dark:bg-[#403b2e] dark:text-[#dfcb99]" : "bg-[#eff4ef] text-[#577861] dark:bg-[#303b33] dark:text-[#b6cabc]"}`}
                   >
                     {formatDate(task.deadline, {
                       day: "2-digit",
                       month: "short",
                     })}
                   </span>
-                  <div>
-                    <strong>{task.title}</strong>
-                    <span>
+                  <div className="grid min-w-0 gap-1">
+                    <strong className="overflow-hidden text-ellipsis whitespace-nowrap text-[10px] font-semibold text-(--text)">
+                      {task.title}
+                    </strong>
+                    <span className="text-[9px] text-(--muted)">
                       {
                         projectCache.find(
                           (project) => project.id === task.projectId,
@@ -808,57 +910,79 @@ export function SettingsPage() {
         title="Settings"
         description="Manage your personal preferences."
       />
-      <section className="settings-panel panel">
-        <div className="settings-section">
+      <section className="max-w-180 rounded-lg border border-(--line) bg-(--surface) px-5.5 max-[650px]:px-3.5">
+        <div className="border-b border-(--line) pt-5 pb-3">
           <div>
-            <h2>Notifications</h2>
-            <p>Choose what you'd like to hear about.</p>
+            <h2 className="m-0 font-['Manrope',sans-serif] text-[13px] text-(--text)">
+              Notifications
+            </h2>
+            <p className="mt-1 mb-3.75 text-[10px] text-(--muted)">
+              Choose what you'd like to hear about.
+            </p>
           </div>
-          <label className="toggle-row">
-            <span>
-              <strong>Task updates</strong>
-              <small>Get notified when tasks change.</small>
+          <label className="flex min-h-14 items-center justify-between gap-3 border-t border-(--line)">
+            <span className="grid gap-0.75">
+              <strong className="text-[10px] font-semibold text-(--text)">
+                Task updates
+              </strong>
+              <small className="text-[9px] text-(--muted)">
+                Get notified when tasks change.
+              </small>
             </span>
             <input
+              className="peer sr-only"
               type="checkbox"
               checked={notifications}
               onChange={(event) => setNotifications(event.target.checked)}
             />
-            <i />
+            <i className="relative h-4.75 w-8.25 shrink-0 rounded-[20px] bg-[#dce3dd] transition-colors duration-200 after:absolute after:top-0.75 after:left-0.75 after:h-3.25 after:w-3.25 after:rounded-full after:bg-white after:transition-transform after:content-[''] peer-checked:bg-[#4d9368] peer-checked:after:translate-x-[14px] peer-focus-visible:outline-[3px] peer-focus-visible:outline-[#91c4a9] peer-focus-visible:outline-offset-2" />
           </label>
-          <label className="toggle-row">
-            <span>
-              <strong>Weekly summary</strong>
-              <small>A Friday recap of your team's progress.</small>
+          <label className="flex min-h-14 items-center justify-between gap-3 border-t border-(--line)">
+            <span className="grid gap-0.75">
+              <strong className="text-[10px] font-semibold text-(--text)">
+                Weekly summary
+              </strong>
+              <small className="text-[9px] text-(--muted)">
+                A Friday recap of your team's progress.
+              </small>
             </span>
             <input
+              className="peer sr-only"
               type="checkbox"
               checked={weekly}
               onChange={(event) => setWeekly(event.target.checked)}
             />
-            <i />
+            <i className="relative h-4.75 w-8.25 shrink-0 rounded-[20px] bg-[#dce3dd] transition-colors duration-200 after:absolute after:top-0.75 after:left-0.75 after:h-3.25 after:w-3.25 after:rounded-full after:bg-white after:transition-transform after:content-[''] peer-checked:bg-[#4d9368] peer-checked:after:translate-x-[14px] peer-focus-visible:outline-[3px] peer-focus-visible:outline-[#91c4a9] peer-focus-visible:outline-offset-2" />
           </label>
         </div>
-        <div className="settings-section profile-settings">
+        <div className="border-b-0 pt-5 pb-3">
           <div>
-            <h2>Profile</h2>
-            <p>Your account details.</p>
+            <h2 className="m-0 font-['Manrope',sans-serif] text-[13px] text-(--text)">
+              Profile
+            </h2>
+            <p className="mt-1 mb-3.75 text-[10px] text-(--muted)">
+              Your account details.
+            </p>
           </div>
-          <div className="profile-row">
+          <div className="flex items-center gap-2.5">
             <Avatar
               name="Alex Morgan"
               src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&h=96&q=80"
             />
-            <div>
-              <strong>Alex Morgan</strong>
-              <span>alex@taskflow.team</span>
+            <div className="grid flex-1 gap-0.75">
+              <strong className="text-[10px]">Alex Morgan</strong>
+              <span className="text-[9px] text-(--muted)">
+                alex@taskflow.team
+              </span>
             </div>
-            <Button variant="secondary">Edit profile</Button>
+            <Button variant="secondary" className="ml-auto">
+              Edit profile
+            </Button>
           </div>
         </div>
-        <div className="settings-save">
+        <div className="flex items-center gap-1.25 pb-4.25 text-[9px] text-(--muted)">
           <span>Changes save automatically</span>
-          <Check size={15} />
+          <Check size={14} className="text-[#55916c]" />
         </div>
       </section>
     </>
