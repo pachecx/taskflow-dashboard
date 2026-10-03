@@ -4,15 +4,20 @@ TaskFlow is a responsive project and task management dashboard for small teams. 
 
 ## Screenshots
 
-Add current product screenshots to `screenshots/` before publishing the portfolio project.
 
-| Dashboard                   | Projects                   |
-| --------------------------- | -------------------------- |
-| `screenshots/dashboard.png` | `screenshots/projects.png` |
+| Dashboard                   | 
+| --------------------------- | 
+| <img width="1917" height="871" alt="Captura de tela 2026-10-01 191255" src="https://github.com/user-attachments/assets/f856e903-3e72-4688-ad55-8b6d883a0c34" />
+
+| Project                   | 
+| --------------------------- | 
+| <img width="1917" height="862" alt="Captura de tela 2026-10-01 191644" src="https://github.com/user-attachments/assets/35f8594d-cbd7-4f1b-9eac-23a2495eb606" />
+
+
 
 ## Live project
 
-Not published yet. Add the deployed URL here after deploying the project (for example, with Vercel or Netlify).
+https://taskflow-dashboard-gamma.vercel.app/login
 
 ## Features
 
