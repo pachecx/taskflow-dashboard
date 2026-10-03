@@ -34,8 +34,8 @@ export function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen grid-cols-[minmax(380px,0.9fr)_minmax(440px,1.1fr)] bg-[#f9faf8] text-[#25352d] max-[650px]:block max-[650px]:min-h-[100dvh]">
-      <section className="relative flex min-h-screen flex-col bg-[#1e382d] px-[9%] py-8.5 text-[#f4f7f3] [background-image:linear-gradient(90deg,#ffffff08_1px,transparent_1px),linear-gradient(#ffffff08_1px,transparent_1px)] [background-size:48px_48px] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(135deg,#25453720,transparent_60%)] after:content-[''] max-[650px]:hidden [&>*]:z-[1]">
+    <main className="grid min-h-screen grid-cols-[minmax(380px,0.9fr)_minmax(440px,1.1fr)] bg-[#f9faf8] text-[#25352d] max-[650px]:block max-[650px]:min-h-dvh">
+      <section className="relative flex min-h-screen flex-col bg-[#1e382d] px-[9%] py-8.5 text-[#f4f7f3] bg-[linear-gradient(90deg,#ffffff08_1px,transparent_1px),linear-gradient(#ffffff08_1px,transparent_1px)] bg-size-[48px_48px] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(135deg,#25453720,transparent_60%)] after:content-[''] max-[650px]:hidden *:z-1">
         <Link
           to="/login"
           className="flex items-center gap-2.5 font-['Manrope',sans-serif] text-[19px] leading-none font-extrabold text-[#f2f8f4]"
@@ -79,7 +79,7 @@ export function LoginPage() {
         </div>
         <span className="text-[9px] text-[#93a89a]">© 2026 TaskFlow, Inc.</span>
       </section>
-      <section className="grid place-items-center p-8.5 max-[650px]:min-h-[100dvh] max-[650px]:px-6 max-[650px]:py-6.25">
+      <section className="grid place-items-center p-8.5 max-[650px]:min-h-dvh max-[650px]:px-6 max-[650px]:py-6.25">
         <form
           className="w-full max-w-87.5 max-[650px]:max-w-95"
           onSubmit={submit}
@@ -159,7 +159,7 @@ export function LoginPage() {
               {error}
             </p>
           )}
-          <Button className="!min-h-10.25 w-full" disabled={loading}>
+          <Button className="min-h-10.25! w-full" disabled={loading}>
             {loading ? (
               <>
                 <span className="h-3.25 w-3.25 animate-[spin_0.7s_linear_infinite] rounded-full border-2 border-[#ffffff75] border-t-white" />{" "}

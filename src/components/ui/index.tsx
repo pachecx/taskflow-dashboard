@@ -1,5 +1,12 @@
 import { X } from "lucide-react";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ButtonHTMLAttributes,
+  type ReactNode,
+} from "react";
 
 export function Button({
   className = "",
@@ -16,9 +23,126 @@ export function Button({
   };
   return (
     <button
-      className={`inline-flex min-h-8.75 items-center justify-center gap-2 rounded-md border px-3.25 text-[11px] font-semibold transition-[background,border-color,transform] duration-[160ms] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-[0.58] ${variants[variant]} ${className}`}
+      className={`inline-flex min-h-8.75 items-center justify-center gap-2 rounded-md border px-3.25 text-[11px] font-semibold transition-[background,border-color,transform] duration-160 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-[0.58] ${variants[variant]} ${className}`}
       {...props}
     />
+  );
+}
+
+export function FilterSelect({
+  value,
+  options,
+  onChange,
+  label,
+  icon,
+  className = "",
+}: {
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+  label: string;
+  icon?: ReactNode;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const selectedIndex = Math.max(
+    0,
+    options.findIndex((option) => option.value === value),
+  );
+  const [activeIndex, setActiveIndex] = useState(selectedIndex);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const listboxId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+    function handlePointerDown(event: PointerEvent) {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  function chooseOption(index: number) {
+    const option = options[index];
+    if (!option) return;
+    onChange(option.value);
+    setActiveIndex(index);
+    setOpen(false);
+  }
+
+  return (
+    <div ref={containerRef} className={`relative inline-flex ${className}`}>
+      <button
+        type="button"
+        className="inline-flex h-8.5 min-w-0 items-center justify-center gap-1.5 rounded-[5px] border border-(--line) bg-(--surface) px-2 text-[10px] text-(--muted-dark) hover:border-[#bdcfc2] focus-visible:outline-[#91c4a9]"
+        aria-label={label}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={listboxId}
+        aria-activedescendant={open ? `${listboxId}-${activeIndex}` : undefined}
+        onClick={() => {
+          setActiveIndex(selectedIndex);
+          setOpen((current) => !current);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
+            setOpen(true);
+            setActiveIndex((index) => {
+              if (!open) return selectedIndex;
+              const direction = event.key === "ArrowDown" ? 1 : -1;
+              return (index + direction + options.length) % options.length;
+            });
+          } else if (event.key === "Enter" && open) {
+            event.preventDefault();
+            chooseOption(activeIndex);
+          } else if (event.key === " " && !open) {
+            event.preventDefault();
+            setActiveIndex(selectedIndex);
+            setOpen(true);
+          }
+        }}
+      >
+        {icon}
+        <span className="truncate">
+          {options[selectedIndex]?.label ?? value}
+        </span>
+        <span aria-hidden="true" className="ml-0.5 text-(--muted)">
+          ▾
+        </span>
+      </button>
+      {open && (
+        <div
+          id={listboxId}
+          className="absolute top-[calc(100%+5px)] left-0 z-40 min-w-full overflow-hidden rounded-md border border-(--line) bg-(--surface) p-1 shadow-[0_8px_24px_#1d38251f]"
+          role="listbox"
+          aria-label={label}
+        >
+          {options.map((option, index) => (
+            <div
+              id={`${listboxId}-${index}`}
+              key={option.value}
+              className={`flex min-h-8.5 cursor-pointer items-center rounded-sm px-2.5 py-1.5 text-[10px] whitespace-nowrap transition-colors ${index === activeIndex ? "bg-(--surface-hover) text-(--text)" : "text-(--muted-dark) hover:bg-(--surface-hover)"} ${option.value === value ? "font-semibold" : ""}`}
+              role="option"
+              aria-selected={option.value === value}
+              onMouseEnter={() => setActiveIndex(index)}
+              onClick={() => chooseOption(index)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -159,7 +283,7 @@ export function Pagination({
       <div className="flex gap-1.5">
         <Button
           variant="secondary"
-          className="!min-h-7.25 !min-w-7.75 !px-2 !text-[17px]"
+          className="min-h-7.25! min-w-7.75! px-2! text-[17px]!"
           disabled={page === 1}
           onClick={() => onChange(page - 1)}
           aria-label="Previous page"
@@ -168,7 +292,7 @@ export function Pagination({
         </Button>
         <Button
           variant="secondary"
-          className="!min-h-7.25 !min-w-7.75 !px-2 !text-[17px]"
+          className="min-h-7.25! min-w-7.75! px-2! text-[17px]!"
           disabled={page === totalPages}
           onClick={() => onChange(page + 1)}
           aria-label="Next page"
@@ -191,7 +315,7 @@ export function Modal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-[60] grid animate-[enter_0.15s_ease] place-items-center bg-[#15251db0] p-5"
+      className="fixed inset-0 z-60 grid animate-[enter_0.15s_ease] place-items-center bg-[#15251db0] p-5"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}

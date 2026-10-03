@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -20,6 +20,7 @@ import {
   Badge,
   Button,
   EmptyState,
+  FilterSelect,
   Modal,
   PageHeading,
   Pagination,
@@ -62,6 +63,50 @@ function SearchField({
         aria-label={placeholder}
       />
     </label>
+  );
+}
+
+type WorkFilter = {
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+  label: string;
+  icon?: ReactNode;
+};
+
+function WorkFilterBar({
+  search,
+  onSearchChange,
+  searchPlaceholder,
+  filters,
+  resultCount,
+  resultLabel,
+}: {
+  search: string;
+  onSearchChange: (value: string) => void;
+  searchPlaceholder: string;
+  filters: WorkFilter[];
+  resultCount: number;
+  resultLabel: string;
+}) {
+  return (
+    <div className="flex min-h-16.75 items-center gap-2.25 border-b border-(--line) max-[650px]:min-h-0 max-[650px]:flex-wrap max-[650px]:gap-1.75 max-[650px]:py-3">
+      <SearchField
+        value={search}
+        onChange={onSearchChange}
+        placeholder={searchPlaceholder}
+      />
+      {filters.map((filter) => (
+        <FilterSelect
+          key={filter.label}
+          {...filter}
+          className="max-[650px]:flex-1 max-[650px]:justify-center"
+        />
+      ))}
+      <span className="ml-auto text-[10px] text-(--muted) max-[650px]:m-0 max-[650px]:w-full">
+        {resultCount} {resultLabel}
+      </span>
+    </div>
   );
 }
 
@@ -217,51 +262,44 @@ export function ProjectsPage() {
         }
       />
       <section className="rounded-lg border border-(--line) bg-(--surface) px-5 pb-0.5">
-        <div className="flex min-h-16.75 items-center gap-2.25 border-b border-(--line) max-[650px]:min-h-0 max-[650px]:flex-wrap max-[650px]:gap-1.75 max-[650px]:py-3">
-          <SearchField
-            value={search}
-            onChange={(value) => {
-              setSearch(value);
-              setPage(1);
-            }}
-            placeholder="Search projects or clients"
-          />
-          <label className="inline-flex h-8.5 items-center gap-1.5 rounded-[5px] border border-(--line) px-2 text-(--muted-dark) max-[650px]:flex-1 max-[650px]:justify-center">
-            <Filter size={15} />
-            <select
-              className="max-w-31.25 appearance-none border-0 bg-transparent text-[10px] text-(--muted-dark) outline-none max-[650px]:max-w-none"
-              value={status}
-              onChange={(event) => {
-                setStatus(event.target.value);
+        <WorkFilterBar
+          search={search}
+          onSearchChange={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
+          searchPlaceholder="Search projects or clients"
+          filters={[
+            {
+              value: status,
+              options: [
+                { value: "All statuses", label: "All statuses" },
+                { value: "Planning", label: "Planning" },
+                { value: "In Progress", label: "In Progress" },
+                { value: "Completed", label: "Completed" },
+                { value: "On Hold", label: "On Hold" },
+              ],
+              onChange: (value) => {
+                setStatus(value);
                 setPage(1);
-              }}
-              aria-label="Filter projects by status"
-            >
-              <option>All statuses</option>
-              <option>Planning</option>
-              <option>In Progress</option>
-              <option>Completed</option>
-              <option>On Hold</option>
-            </select>
-            <ChevronDown size={14} />
-          </label>
-          <label className="inline-flex h-8.5 items-center gap-1.5 rounded-[5px] border border-(--line) px-2 text-(--muted-dark) max-[650px]:flex-1 max-[650px]:justify-center">
-            <SlidersHorizontal size={15} />
-            <select
-              className="max-w-31.25 appearance-none border-0 bg-transparent text-[10px] text-(--muted-dark) outline-none max-[650px]:max-w-none"
-              value={sort}
-              onChange={(event) => setSort(event.target.value)}
-              aria-label="Sort projects"
-            >
-              <option value="deadline">Deadline</option>
-              <option value="name">Name</option>
-            </select>
-            <ChevronDown size={14} />
-          </label>
-          <span className="ml-auto text-[10px] text-(--muted) max-[650px]:m-0 max-[650px]:w-full">
-            {list.length} projects
-          </span>
-        </div>
+              },
+              label: "Filter projects by status",
+              icon: <Filter size={15} />,
+            },
+            {
+              value: sort,
+              options: [
+                { value: "deadline", label: "Deadline" },
+                { value: "name", label: "Name" },
+              ],
+              onChange: setSort,
+              label: "Sort projects",
+              icon: <SlidersHorizontal size={15} />,
+            },
+          ]}
+          resultCount={list.length}
+          resultLabel="projects"
+        />
         {query.isPending ? (
           <div className="py-2">
             {Array.from({ length: 4 }, (_, i) => (
@@ -409,9 +447,7 @@ export function ProjectDetailPage() {
       />
       <section className="mb-4 grid grid-cols-[1.4fr_1fr_1fr] gap-5 rounded-lg border border-(--line) bg-(--surface) p-[18px_20px] max-[650px]:grid-cols-2 max-[650px]:gap-x-2.5 max-[650px]:gap-y-4.25 max-[650px]:p-3.75 [&>div]:flex [&>div]:flex-col [&>div]:gap-2.25 [&>div:first-child]:max-[650px]:col-span-full">
         <div>
-          <span className="text-[9px] text-(--muted)">
-            Project progress
-          </span>
+          <span className="text-[9px] text-(--muted)">Project progress</span>
           <div className="flex items-center gap-3">
             <ProgressBar value={project.progress} />
             <strong className="text-[11px] text-(--text)">
@@ -503,57 +539,52 @@ export function TasksPage() {
         }
       />
       <section className="rounded-lg border border-(--line) bg-(--surface) px-5 pb-0.5">
-        <div className="flex min-h-16.75 items-center gap-2.25 border-b border-(--line) max-[650px]:min-h-0 max-[650px]:flex-wrap max-[650px]:gap-1.75 max-[650px]:py-3">
-          <SearchField
-            value={search}
-            onChange={(value) => {
-              setSearch(value);
-              setPage(1);
-            }}
-            placeholder="Search tasks"
-          />
-          <label className="inline-flex h-8.5 items-center gap-1.5 rounded-[5px] border border-(--line) px-2 text-(--muted-dark) max-[650px]:flex-1 max-[650px]:justify-center">
-            <Filter size={15} />
-            <select
-              className="max-w-31.25 appearance-none border-0 bg-transparent text-[10px] text-(--muted-dark) outline-none max-[650px]:max-w-none"
-              value={status}
-              onChange={(event) => {
-                setStatus(event.target.value);
+        <WorkFilterBar
+          search={search}
+          onSearchChange={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
+          searchPlaceholder="Search tasks"
+          filters={[
+            {
+              value: status,
+              options: [
+                { value: "All statuses", label: "All statuses" },
+                { value: "To Do", label: "To Do" },
+                { value: "In Progress", label: "In Progress" },
+                { value: "Completed", label: "Completed" },
+              ],
+              onChange: (value) => {
+                setStatus(value);
                 setPage(1);
-              }}
-              aria-label="Filter tasks by status"
-            >
-              <option>All statuses</option>
-              <option>To Do</option>
-              <option>In Progress</option>
-              <option>Completed</option>
-            </select>
-            <ChevronDown size={14} />
-          </label>
-          <label className="inline-flex h-8.5 items-center gap-1.5 rounded-[5px] border border-(--line) px-2 text-(--muted-dark) max-[650px]:flex-1 max-[650px]:justify-center">
-            <span className="grid h-3.5 w-3.5 place-items-center rounded-full bg-[#f7f3e9] text-[10px] font-bold text-[#9b7a49]">
-              !
-            </span>
-            <select
-              className="max-w-31.25 appearance-none border-0 bg-transparent text-[10px] text-(--muted-dark) outline-none max-[650px]:max-w-none"
-              value={priority}
-              onChange={(event) => {
-                setPriority(event.target.value);
+              },
+              label: "Filter tasks by status",
+              icon: <Filter size={15} />,
+            },
+            {
+              value: priority,
+              options: [
+                { value: "All priorities", label: "All priorities" },
+                { value: "High", label: "High" },
+                { value: "Medium", label: "Medium" },
+                { value: "Low", label: "Low" },
+              ],
+              onChange: (value) => {
+                setPriority(value);
                 setPage(1);
-              }}
-              aria-label="Filter tasks by priority"
-            >
-              <option>All priorities</option>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-            <ChevronDown size={14} />
-          </label>
-          <span className="ml-auto text-[10px] text-(--muted) max-[650px]:m-0 max-[650px]:w-full">
-            {filtered.length} tasks
-          </span>
-        </div>
+              },
+              label: "Filter tasks by priority",
+              icon: (
+                <span className="grid h-3.5 w-3.5 place-items-center rounded-full bg-[#f7f3e9] text-[10px] font-bold text-[#9b7a49]">
+                  !
+                </span>
+              ),
+            },
+          ]}
+          resultCount={filtered.length}
+          resultLabel="tasks"
+        />
         {query.isPending ? (
           <div className="py-2">
             {Array.from({ length: 5 }, (_, i) => (
@@ -579,7 +610,7 @@ export function TasksPage() {
       </section>
       {update.isSuccess && (
         <div
-          className="fixed right-6.25 bottom-6 z-[50] flex items-center gap-2 rounded-md border border-[#d5e8da] bg-[#f0f8f1] px-3.75 py-2.75 text-[11px] text-[#397950] shadow-[0_8px_24px_#1d38251a] animate-[enter_0.2s_ease]"
+          className="fixed right-6.25 bottom-6 z-50 flex items-center gap-2 rounded-md border border-[#d5e8da] bg-[#f0f8f1] px-3.75 py-2.75 text-[11px] text-[#397950] shadow-[0_8px_24px_#1d38251a] animate-[enter_0.2s_ease]"
           role="status"
         >
           <Check size={16} /> Task status updated
@@ -651,24 +682,18 @@ function TaskTable({
                 </td>
                 <td>
                   {onStatusChange ? (
-                    <label className="inline-flex items-center gap-0.5 rounded border border-(--line) px-1.5 py-1 text-(--muted-dark) focus-within:border-[#91b99c]">
-                      <select
-                        className="max-w-21.5 appearance-none border-0 bg-transparent text-[9px] text-inherit outline-none"
-                        value={task.status}
-                        onChange={(event) =>
-                          onStatusChange(
-                            task.id,
-                            event.target.value as TaskStatus,
-                          )
-                        }
-                        aria-label={`Change status for ${task.title}`}
-                      >
-                        <option>To Do</option>
-                        <option>In Progress</option>
-                        <option>Completed</option>
-                      </select>
-                      <ChevronDown size={12} />
-                    </label>
+                    <FilterSelect
+                      value={task.status}
+                      options={[
+                        { value: "To Do", label: "To Do" },
+                        { value: "In Progress", label: "In Progress" },
+                        { value: "Completed", label: "Completed" },
+                      ]}
+                      onChange={(value) =>
+                        onStatusChange(task.id, value as TaskStatus)
+                      }
+                      label={`Change status for ${task.title}`}
+                    />
                   ) : (
                     <Badge>{task.status}</Badge>
                   )}
@@ -723,7 +748,7 @@ export function TeamPage() {
                       src={member.avatar}
                       name={member.name}
                       size="large"
-                      className="-mt-7 border-[3px] border-(--surface) max-[650px]:-mt-6.25 max-[650px]:!h-14 max-[650px]:!w-14"
+                      className="-mt-7 border-[3px] border-(--surface) max-[650px]:-mt-6.25 max-[650px]:h-14! max-[650px]:w-14!"
                     />
                     <h2 className="mt-2.5 mb-0.5 font-['Manrope',sans-serif] text-[13px] font-bold text-(--text)">
                       {member.name}
@@ -935,7 +960,7 @@ export function SettingsPage() {
               checked={notifications}
               onChange={(event) => setNotifications(event.target.checked)}
             />
-            <i className="relative h-4.75 w-8.25 shrink-0 rounded-[20px] bg-[#dce3dd] transition-colors duration-200 after:absolute after:top-0.75 after:left-0.75 after:h-3.25 after:w-3.25 after:rounded-full after:bg-white after:transition-transform after:content-[''] peer-checked:bg-[#4d9368] peer-checked:after:translate-x-[14px] peer-focus-visible:outline-[3px] peer-focus-visible:outline-[#91c4a9] peer-focus-visible:outline-offset-2" />
+            <i className="relative h-4.75 w-8.25 shrink-0 rounded-[20px] bg-[#dce3dd] transition-colors duration-200 after:absolute after:top-0.75 after:left-0.75 after:h-3.25 after:w-3.25 after:rounded-full after:bg-white after:transition-transform after:content-[''] peer-checked:bg-[#4d9368] peer-checked:after:translate-x-3.5 peer-focus-visible:outline-[3px] peer-focus-visible:outline-[#91c4a9] peer-focus-visible:outline-offset-2" />
           </label>
           <label className="flex min-h-14 items-center justify-between gap-3 border-t border-(--line)">
             <span className="grid gap-0.75">
@@ -952,7 +977,7 @@ export function SettingsPage() {
               checked={weekly}
               onChange={(event) => setWeekly(event.target.checked)}
             />
-            <i className="relative h-4.75 w-8.25 shrink-0 rounded-[20px] bg-[#dce3dd] transition-colors duration-200 after:absolute after:top-0.75 after:left-0.75 after:h-3.25 after:w-3.25 after:rounded-full after:bg-white after:transition-transform after:content-[''] peer-checked:bg-[#4d9368] peer-checked:after:translate-x-[14px] peer-focus-visible:outline-[3px] peer-focus-visible:outline-[#91c4a9] peer-focus-visible:outline-offset-2" />
+            <i className="relative h-4.75 w-8.25 shrink-0 rounded-[20px] bg-[#dce3dd] transition-colors duration-200 after:absolute after:top-0.75 after:left-0.75 after:h-3.25 after:w-3.25 after:rounded-full after:bg-white after:transition-transform after:content-[''] peer-checked:bg-[#4d9368] peer-checked:after:translate-x-3.5 peer-focus-visible:outline-[3px] peer-focus-visible:outline-[#91c4a9] peer-focus-visible:outline-offset-2" />
           </label>
         </div>
         <div className="border-b-0 pt-5 pb-3">

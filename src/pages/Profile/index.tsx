@@ -40,7 +40,7 @@ export function ProfilePage() {
       />
       {success && (
         <div
-          className="my-[-10px] mb-3.5 flex items-center gap-2 rounded-[5px] border border-[#d5e8da] bg-[#f0f8f1] px-3 py-2.5 text-[10px] text-[#397950] dark:border-[#355441] dark:bg-[#24372a] dark:text-[#a6d7b1]"
+          className="-my-2.5 mb-3.5 flex items-center gap-2 rounded-[5px] border border-[#d5e8da] bg-[#f0f8f1] px-3 py-2.5 text-[10px] text-[#397950] dark:border-[#355441] dark:bg-[#24372a] dark:text-[#a6d7b1]"
           role="status"
         >
           <Check size={16} /> Profile updated successfully.

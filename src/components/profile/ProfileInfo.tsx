@@ -31,7 +31,7 @@ export function ProfileInfo({ profile }: { profile: UserProfile }) {
       <dl className="m-0 grid grid-cols-2 border-t border-(--line) max-[650px]:grid-cols-1">
         {fields.map(({ key, label, icon: Icon }) => (
           <div
-            className="min-w-0 border-b border-(--line) py-3.75 pr-3 pb-3.5 last:border-b-0 nth-last-2:border-b-0 max-[650px]:[&:nth-last-child(2)]:border-b"
+            className="min-w-0 border-b border-(--line) py-3.75 pr-3 pb-3.5 last:border-b-0 nth-last-2:border-b-0 max-[650px]:nth-last-2:border-b"
             key={key}
           >
             <dt className="flex items-center gap-1.5 text-[9px] text-(--muted)">
@@ -40,11 +40,9 @@ export function ProfileInfo({ profile }: { profile: UserProfile }) {
               )}
               {label}
             </dt>
-            <dd className="mt-1.5 mb-0 [overflow-wrap:anywhere] text-[11px] font-medium text-(--text)">
+            <dd className="mt-1.5 mb-0 wrap-anywhere text-[11px] font-medium text-(--text)">
               {profile[key] || (
-                <span className="font-normal text-(--muted)">
-                  Not added
-                </span>
+                <span className="font-normal text-(--muted)">Not added</span>
               )}
             </dd>
           </div>
